@@ -9,34 +9,6 @@ app.use(express.json())
 // creating a custom token named body to log reuest body
 morgan.token('body', (req, res) => JSON.stringify(req.body));
 
-let persons = [
-    { 
-        "id": 1,
-        "name": "Arto Hellas", 
-        "number": "040-123456"
-    },
-    { 
-        "id": 2,
-        "name": "Ada Lovelace", 
-        "number": "39-44-5323523"
-    },
-    { 
-        "id": 3,
-        "name": "Dan Abramov", 
-        "number": "12-43-234345"
-    },
-    { 
-        "id": 4,
-        "name": "Mary Poppendieck", 
-        "number": "39-23-6423122"
-    }
-]
-
-function generateId(){
-  let newId =  persons.length > 0 ? Math.max(...persons.map(x => x.id)) : 0
-  return newId + 1
-}
-// console.log(`the maximum id number is ${generateId()}`)
 
 
 app.get('/', (req, res) => {
