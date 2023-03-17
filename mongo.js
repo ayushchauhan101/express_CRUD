@@ -10,4 +10,16 @@ async function main(){
 }
 main()
 
+const PhoneSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+        lowercase: true,
+    },
+    number: {
+        type: Number,
+        required: true,
+    },
+})
 
+const User = mongoose.model('User', PhoneSchema)
