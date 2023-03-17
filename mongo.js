@@ -56,5 +56,16 @@ try{
     }
     
 }
+// saveEntry()
 
-saveEntry()
+async function searchEntry(){
+    try{
+        // let result = await Phone.find({name:"dan abramov"}).exec()
+        let result = await Phone.find({}).exec()
+        console.log(result)
+    }catch(err){
+        console.log(err)
+    }
+}
+
+searchEntry()
