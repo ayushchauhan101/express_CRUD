@@ -1,15 +1,14 @@
 const express = require('express')
 const morgan = require('morgan')
-
 const app = express();
-app.use(express.json())
 
+const Phone = require('./myMongoDB')
+
+app.use(express.json())
 // app.use(morgan('tiny'))
 
 // creating a custom token named body to log reuest body
 morgan.token('body', (req, res) => JSON.stringify(req.body));
-
-
 
 app.get('/', (req, res) => {
     res.send('homepage')
@@ -17,19 +16,21 @@ app.get('/', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-  res.send(`Phonebook has info for ${persons.length} people \n${new Date()}`)
+  res.send(`Phonebook has info for ${Phone.length} people \n${new Date()}`)
   console.log('info is running...')
 })
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Phone.find({}).then(x => {
+      res.json(x)
+    })
 })
 
 // get an entry
 app.get('/api/persons/:id', (req, res) => {
     let my_id = Number(req.params.id)
 
-    let result = persons.find(person => person.id === my_id)
+    let result = Phone.find(person => person.id === my_id)
     
     if(result){
         res.json(result)
@@ -45,9 +46,7 @@ app.delete('/api/persons/:id', (req, res) => {
     
     // creating a shallow copy with entries that dosent match my_id
     persons = persons.filter(person => person.id !== my_id)
-
     res.sendStatus(204).end()
-
     console.log('delete entry is running...')
 })
 
@@ -70,7 +69,7 @@ app.post('/api/persons', morgan(':method :url :status :res[content-length] - :re
 
     else{
       let new_entry = {
-        id: generateId(),
+        // id: generateId(),
         name: received_data.name,
         number: received_data.number,
       }
