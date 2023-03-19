@@ -60,17 +60,31 @@ app.delete('/api/persons/:id', (req, res, next) => {
       .catch(error => next(error))
 })
 
+app.get('/api/persons/number/:number', (req, res, next) => {
+    Phone.find({number: req.params.number})
+      .then(result => {
+        if(result.length > 0){
+          res.json(result)
+          console.log(result)
+        }
+        else{
+          res.status(404).json({error:'cannot find the person'})
+        }
+      })
+      .catch(err => next(err))
+})
+
 app.put('/api/person/:id', (req, res, next) => {
-    let body = req.body
-    
-    let person = {
+    const body = req.body
+
+    const person = {
       name : body.name,
       number : body.number,
     }
-    console.log(person)
+    
     Phone.findByIdAndUpdate(req.params.id, person, {new:true})
       .then(updatedPerson => {
-        res.status(200).json(updatedPerson)
+        res.json(updatedPerson)
       })
       .catch(error => next(error))
 })
