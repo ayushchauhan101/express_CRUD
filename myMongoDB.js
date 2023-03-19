@@ -27,46 +27,6 @@ const PhoneSchema = new mongoose.Schema({
 // model declaration
 const Phone = mongoose.model('Phone', PhoneSchema)
 
-let new_entry =
-[{ 
-    "name": "Arto Hellas", 
-    "number": "040123456"
-},
-{ 
-    "name": "Ada Lovelace", 
-    "number": "39445323523"
-},
-{ 
-    "name": "Dan Abramov", 
-    "number": "1243234345"
-},
-{ 
-    "name": "Mary Poppendieck", 
-    "number": "39236423122"
-}]
-
-async function saveEntry(){
-try{
-        await Phone.insertMany(new_entry)
-        console.log(new_entry)
-    }catch(err){
-        console.log(err)
-    }
-    
-}
-// saveEntry()
-
-async function searchEntry(){
-    try{
-        // let result = await Phone.find({name:"dan abramov"}).exec()
-        let result = await Phone.find({}).exec()
-        console.log(result)
-    }catch(err){
-        console.log(err)
-    }
-}
-// searchEntry()
-
 // there are teo same object ids but using only .id instead of ._id
 PhoneSchema.set('toJSON', {
     transform: (document, returnedObject) => {
