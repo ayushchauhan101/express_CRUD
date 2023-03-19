@@ -27,7 +27,7 @@ const PhoneSchema = new mongoose.Schema({
 // model declaration
 const Phone = mongoose.model('Phone', PhoneSchema)
 
-// there are teo same object ids but using only .id instead of ._id
+// there are two same object ids but using only .id instead of ._id
 PhoneSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()

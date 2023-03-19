@@ -4,11 +4,23 @@ const app = express();
 
 const Phone = require('./myMongoDB')
 
-app.use(express.json())
-// app.use(morgan('tiny'))
-
 // creating a custom token named body to log reuest body
 morgan.token('body', (req, res) => JSON.stringify(req.body));
+
+// custom error handler middleware
+function errorHandler(error, request, response, next){
+  console.log(request)
+  console.log(error.message)
+  if(error.name === 'CastError'){
+    return response.status(400).send({
+      error: 'please check the id and its format'
+    })
+  }
+
+  next(console.error())
+}
+
+app.use(express.json())
 
 app.get('/', (req, res) => {
     res.send('homepage')
@@ -26,61 +38,68 @@ app.get('/api/persons', (req, res) => {
     })
 })
 
-// get an entry
-app.get('/api/persons/:id', (req, res) => {
-    let my_id = Number(req.params.id)
+app.get('/api/persons/:id', (req, res, next) => {
+    Phone.findById(req.params.id)
+      .then(person => {
+        if(person){
+          res.json(person)
+          console.log(person)
+        }
+        else{
+          res.status(404).json({error:'cannot find the person'})
+        }
+      })
+      .catch(err => next(err))
+})
 
-    let result = Phone.find(person => person.id === my_id)
+app.delete('/api/persons/:id', (req, res, next) => {
+    Phone.findByIdAndRemove(req.params.id)
+      .then(result => {
+        res.status(200).end()
+      })
+      .catch(error => next(error))
+})
+
+app.put('/api/person/:id', (req, res, next) => {
+    let body = req.body
     
-    if(result){
-        res.json(result)
-    }else{
-        res.sendStatus(404).end()
+    let person = {
+      name : body.name,
+      number : body.number,
     }
-    console.log('get persons by id number is running...')
+    console.log(person)
+    Phone.findByIdAndUpdate(req.params.id, person, {new:true})
+      .then(updatedPerson => {
+        res.status(200).json(updatedPerson)
+      })
+      .catch(error => next(error))
 })
 
-// delete an entry
-app.delete('/api/persons/:id', (req, res) => {
-    let my_id = Number(req.params.id)
-    
-    // creating a shallow copy with entries that dosent match my_id
-    persons = persons.filter(person => person.id !== my_id)
-    res.sendStatus(204).end()
-    console.log('delete entry is running...')
-})
-
-// create an entry
-// app.post('/api/persons', morgan('tiny') ,(req, res) => {
 app.post('/api/persons', morgan(':method :url :status :res[content-length] - :response-time ms :body') ,(req, res) => {
-    const received_data = req.body
+    let received_data = req.body
 
     // error if empty
     if(!received_data.name || !received_data.number){
-      res.status(400).json({error: 'phone or number missing'})
-    }
-
-    // don't save same values again
-    else if(persons.map(x => x.name).includes(received_data.name) || persons.map(x => x.number).includes(received_data.number))
-    {
-      console.log('name or number already in use, choose another')
-      res.status(400).json({error: 'phone or number already in use'})
+      res.status(400).json({error: 'name or number missing'})
     }
 
     else{
-      let new_entry = {
-        // id: generateId(),
-        name: received_data.name,
-        number: received_data.number,
-      }
-
-      persons = persons.concat(new_entry)
-      res.json(persons)
-      console.log(new_entry)
+        // Instantiating a new entry
+        let new_entry = new Phone({
+          name: received_data.name,
+          number: received_data.number,
+        })
+        
+        // saving the entry built above
+        new_entry.save()
+          .then(savedPerson => {
+            res.json(savedPerson)
+        })
+        
+        console.log('new entry is added...')
     }
-
-    console.log('new entry is added...')
 })
 
+app.use(errorHandler)
 
 app.listen(8000, console.log('running on port 8000'))
