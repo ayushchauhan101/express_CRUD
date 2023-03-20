@@ -1,25 +1,21 @@
 const express = require('express')
-const morgan = require('morgan')
 const app = express();
 
 const Phone = require('./myMongoDB')
 
-// creating a custom token named body to log reuest body
-morgan.token('body', (req, res) => JSON.stringify(req.body));
-
 // custom error handler middleware
-function errorHandler(error, request, response, next){
-  console.log(request)
-  console.log(error.message)
-  if(error.name === 'CastError'){
-    return response.status(400).send({
-      error: 'please check the id and its format'
-    })
-  }
+function errorHandler(error, request, response, next){  
+    console.log(error.message)
+    if(error.name === 'CastError'){
+      return response.status(400).send({error: 'please check the id and its format'})
+    }
+    else if(error.name === 'ValidationError'){
+      res.status(400).json({error: error.message})
+    }
+
   next(error())
 }
 
-app.use(morgan('tiny'))
 app.use(express.json())
 
 app.get('/', (req, res) => {
@@ -76,43 +72,28 @@ app.get('/api/persons/number/:number', (req, res, next) => {
 
 app.put('/api/person/:id', (req, res, next) => {
 
-    const body = req.body
+    const {name, number} = req.body
 
-    const person = {
-      name : body.name,
-      number : body.number,
-    }
-
-    Phone.findByIdAndUpdate(req.params.id, person, {new: true})
+    Phone.findByIdAndUpdate(req.params.id, {name, number}, {new: true, runValidators: true, context: 'query'})
       .then(updatedPerson => {
         res.json(updatedPerson)
       })
       .catch(err => next(err))
 })
 
-app.post('/api/persons', morgan(':method :url :status :res[content-length] - :response-time ms :body') ,(req, res) => {
-    let received_data = req.body
+app.post('/api/persons', (req, res, next) => {
+    const received_data = req.body
 
-    // error if empty
-    if(!received_data.name || !received_data.number){
-      res.status(400).json({error: 'name or number missing'})
-    }
+    const new_entry = new Phone({
+      name: received_data.name,
+      number: received_data.number
+    })
 
-    else{
-        // Instantiating a new entry
-        let new_entry = new Phone({
-          name: received_data.name,
-          number: received_data.number,
-        })
-        
-        // saving the entry built above
-        new_entry.save()
-          .then(savedPerson => {
-            res.json(savedPerson)
-        })
-        
-        console.log('new entry is added...')
-    }
+    new_entry.save()
+      .then(savedPerson => {
+        res.json(savedPerson)
+      })
+      .catch(err => next(err))
 })
 
 function unkownEndpoint(req, res){

@@ -23,10 +23,12 @@ const PhoneSchema = new mongoose.Schema({
         type: String,
         required: true,
         lowercase: true,
+        minLength: 5,
     },
     number: {
         type: Number,
         required: true,
+        minLength: 5,
     },
 })
 
