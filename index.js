@@ -16,10 +16,10 @@ function errorHandler(error, request, response, next){
       error: 'please check the id and its format'
     })
   }
-
-  next(console.error())
+  next(error())
 }
 
+app.use(morgan('tiny'))
 app.use(express.json())
 
 app.get('/', (req, res) => {
@@ -76,17 +76,17 @@ app.get('/api/persons/number/:number', (req, res, next) => {
 
 app.put('/api/person/:id', (req, res, next) => {
     const body = req.body
-
+    console.log(body)
     const person = {
       name : body.name,
       number : body.number,
     }
     
-    Phone.findByIdAndUpdate(req.params.id, person, {new:true})
+    Phone.findByIdAndUpdate(req.params.id, person)
       .then(updatedPerson => {
         res.json(updatedPerson)
       })
-      .catch(error => next(error))
+      .catch(err => next(err))
 })
 
 app.post('/api/persons', morgan(':method :url :status :res[content-length] - :response-time ms :body') ,(req, res) => {
@@ -114,6 +114,12 @@ app.post('/api/persons', morgan(':method :url :status :res[content-length] - :re
     }
 })
 
+function unkownEndpoint(req, res){
+  res.status(404).send({error: 'unkown address or endpoint'})
+  console.log(req.body)
+}
+
+app.use(unkownEndpoint)
 app.use(errorHandler)
 
 app.listen(8000, console.log('running on port 8000'))
