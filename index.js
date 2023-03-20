@@ -75,14 +75,15 @@ app.get('/api/persons/number/:number', (req, res, next) => {
 })
 
 app.put('/api/person/:id', (req, res, next) => {
+
     const body = req.body
-    console.log(body)
+
     const person = {
       name : body.name,
       number : body.number,
     }
-    
-    Phone.findByIdAndUpdate(req.params.id, person)
+
+    Phone.findByIdAndUpdate(req.params.id, person, {new: true})
       .then(updatedPerson => {
         res.json(updatedPerson)
       })

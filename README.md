@@ -9,7 +9,7 @@ The app contains all the CRUD functions within express:
 
 CREATE : app.post
 READ : app.get
-UPDATE : app.post
+UPDATE : app.put
 DELETE : app.delete
 
 The purpose of this project is to make a simple app that is as easy to understand and possible.
