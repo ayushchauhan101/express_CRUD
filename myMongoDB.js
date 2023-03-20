@@ -6,8 +6,14 @@ let db_name = 'demo'
 // connection string
 async function main(){
     console.log('trying to connect to ' + db_name)
-    await mongoose.connect(`${uri}${db_name}`)
-    console.log('connected to local DB: '+db_name)
+    try{
+        await mongoose.connect(`${uri}${db_name}`)
+        console.log('connected to local DB: '+db_name)
+    }
+    catch(err){
+        console.log('error')
+        console.log(err)
+    }
 }
 main()
 
