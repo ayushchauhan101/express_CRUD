@@ -1,5 +1,5 @@
 # express_CRUD
-a simple CRUD(create-read-update-delete) app using express and additional functionalities by morgan
+a simple CRUD(create-read-update-delete) app using express and additional logging functionalities by morgan
 
 npm run start to run this app.
 
@@ -11,3 +11,9 @@ CREATE : app.post
 READ : app.get
 UPDATE : app.post
 DELETE : app.delete
+
+The purpose of this project is to make a simple app that is as easy to understand and possible.
+
+The project is confinde within a single folder.
+
+All feedbacks appreciated.
